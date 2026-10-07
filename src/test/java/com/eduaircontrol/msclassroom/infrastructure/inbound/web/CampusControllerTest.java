@@ -196,4 +196,30 @@ class CampusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(0));
     }
+
+    @Test
+    void listIsScopedByInstitutionHeader() throws Exception {
+        UUID institutionA = UUID.randomUUID();
+        UUID institutionB = UUID.randomUUID();
+
+        mockMvc.perform(post("/api/v1/campuses")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .header("X-Institution-Id", institutionA.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"code\":\"CAMP-A\",\"name\":\"Campus A\"}"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/campuses")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .header("X-Institution-Id", institutionB.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meta.total").value(0));
+
+        mockMvc.perform(get("/api/v1/campuses")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .header("X-Institution-Id", institutionA.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meta.total").value(1))
+                .andExpect(jsonPath("$.data[0].code").value("CAMP-A"));
+    }
 }

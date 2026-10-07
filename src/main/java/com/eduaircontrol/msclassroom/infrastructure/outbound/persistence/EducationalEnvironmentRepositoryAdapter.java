@@ -49,8 +49,13 @@ public class EducationalEnvironmentRepositoryAdapter implements EducationalEnvir
     }
 
     @Override
+    public Optional<UUID> findCampusInstitutionId(UUID campusId) {
+        return campusJpaRepository.findById(campusId).map(campus -> campus.getInstitutionId());
+    }
+
+    @Override
     public PageResult<EducationalEnvironment> search(String query, RecordStatus status,
-            UUID campusId, UUID environmentTypeId, int page, int limit) {
+            UUID campusId, UUID environmentTypeId, UUID institutionId, int page, int limit) {
         Specification<EducationalEnvironment> specification = (root, q, cb) -> {
             List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
             predicates.add(cb.isNull(root.get("deletedAt")));
@@ -68,6 +73,9 @@ public class EducationalEnvironmentRepositoryAdapter implements EducationalEnvir
             }
             if (environmentTypeId != null) {
                 predicates.add(cb.equal(root.get("environmentTypeId"), environmentTypeId));
+            }
+            if (institutionId != null) {
+                predicates.add(cb.equal(root.get("institutionId"), institutionId));
             }
             return cb.and(predicates.toArray(jakarta.persistence.criteria.Predicate[]::new));
         };

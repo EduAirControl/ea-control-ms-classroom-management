@@ -23,7 +23,8 @@ public class EducationalEnvironmentService {
     @Transactional(readOnly = true)
     public PageResult<EducationalEnvironment> list(String query, RecordStatus status,
             UUID campusId, UUID environmentTypeId, int page, int limit) {
-        return environmentRepository.search(query, status, campusId, environmentTypeId, page, limit);
+        return environmentRepository.search(query, status, campusId, environmentTypeId,
+                TenantContext.institutionId(), page, limit);
     }
 
     @Transactional(readOnly = true)
@@ -43,6 +44,8 @@ public class EducationalEnvironmentService {
         }
         EducationalEnvironment environment = EducationalEnvironment.builder()
                 .campusId(campusId)
+                .institutionId(environmentRepository.findCampusInstitutionId(campusId)
+                        .orElse(TenantContext.institutionId()))
                 .code(normalizedCode)
                 .name(CampusService.requireText(name, "name"))
                 .environmentTypeId(environmentTypeId)
@@ -64,6 +67,8 @@ public class EducationalEnvironmentService {
         }
         if (campusId != null) {
             environment.setCampusId(campusId);
+            environment.setInstitutionId(environmentRepository.findCampusInstitutionId(campusId)
+                    .orElse(environment.getInstitutionId()));
         }
         if (code != null) {
             String normalizedCode = CampusService.requireText(code, "code").toUpperCase();

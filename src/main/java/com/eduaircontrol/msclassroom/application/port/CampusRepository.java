@@ -14,5 +14,5 @@ public interface CampusRepository {
 
     boolean existsByCode(String code);
 
-    PageResult<Campus> search(String query, RecordStatus status, int page, int limit);
+    PageResult<Campus> search(String query, RecordStatus status, UUID institutionId, int page, int limit);
 }

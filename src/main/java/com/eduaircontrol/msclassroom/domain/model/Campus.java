@@ -41,6 +41,9 @@ public class Campus {
     @Column(length = 100)
     private String city;
 
+    @Column(name = "institution_id")
+    private UUID institutionId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private RecordStatus status;
