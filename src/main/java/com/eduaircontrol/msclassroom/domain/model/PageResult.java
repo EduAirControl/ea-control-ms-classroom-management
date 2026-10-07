@@ -1,4 +1,4 @@
-package com.eduaircontrol.msclassroom.application.page;
+package com.eduaircontrol.msclassroom.domain.model;
 
 import java.util.List;
 

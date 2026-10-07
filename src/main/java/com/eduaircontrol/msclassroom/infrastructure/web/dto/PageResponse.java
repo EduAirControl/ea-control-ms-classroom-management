@@ -1,6 +1,6 @@
 package com.eduaircontrol.msclassroom.infrastructure.web.dto;
 
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import java.util.List;
 import java.util.function.Function;
 

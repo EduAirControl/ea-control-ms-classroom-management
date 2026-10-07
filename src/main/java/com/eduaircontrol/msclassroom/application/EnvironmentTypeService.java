@@ -1,6 +1,6 @@
 package com.eduaircontrol.msclassroom.application;
 
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.port.out.EnvironmentTypeRepository;
 import com.eduaircontrol.msclassroom.shared.exception.ConflictException;
 import com.eduaircontrol.msclassroom.shared.exception.NotFoundException;

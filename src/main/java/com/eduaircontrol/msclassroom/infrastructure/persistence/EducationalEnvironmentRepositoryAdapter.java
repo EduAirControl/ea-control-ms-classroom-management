@@ -1,6 +1,6 @@
 package com.eduaircontrol.msclassroom.infrastructure.persistence;
 
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.port.out.EducationalEnvironmentRepository;
 import com.eduaircontrol.msclassroom.domain.model.EducationalEnvironment;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;

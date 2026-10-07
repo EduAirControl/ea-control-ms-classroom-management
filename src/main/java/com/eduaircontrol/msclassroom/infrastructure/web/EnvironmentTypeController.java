@@ -1,7 +1,7 @@
 package com.eduaircontrol.msclassroom.infrastructure.web;
 
 import com.eduaircontrol.msclassroom.application.EnvironmentTypeService;
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.model.EnvironmentType;
 import com.eduaircontrol.msclassroom.infrastructure.web.dto.EnvironmentTypeCreateRequest;
 import com.eduaircontrol.msclassroom.infrastructure.web.dto.EnvironmentTypeResponse;

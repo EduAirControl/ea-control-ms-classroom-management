@@ -1,6 +1,6 @@
 package com.eduaircontrol.msclassroom.domain.port.out;
 
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.model.EnvironmentType;
 import java.util.Optional;
 import java.util.UUID;

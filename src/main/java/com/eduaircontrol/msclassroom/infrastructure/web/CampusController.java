@@ -1,7 +1,7 @@
 package com.eduaircontrol.msclassroom.infrastructure.web;
 
 import com.eduaircontrol.msclassroom.application.CampusService;
-import com.eduaircontrol.msclassroom.application.page.PageResult;
+import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.model.Campus;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
 import com.eduaircontrol.msclassroom.infrastructure.web.dto.CampusCreateRequest;
