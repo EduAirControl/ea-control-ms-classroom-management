@@ -1,10 +1,10 @@
 package com.eduaircontrol.msclassroom.application;
 
 import com.eduaircontrol.msclassroom.application.page.PageResult;
-import com.eduaircontrol.msclassroom.application.port.EducationalEnvironmentRepository;
-import com.eduaircontrol.msclassroom.domain.exception.ConflictException;
-import com.eduaircontrol.msclassroom.domain.exception.NotFoundException;
-import com.eduaircontrol.msclassroom.domain.exception.ValidationException;
+import com.eduaircontrol.msclassroom.domain.port.out.EducationalEnvironmentRepository;
+import com.eduaircontrol.msclassroom.shared.exception.ConflictException;
+import com.eduaircontrol.msclassroom.shared.exception.NotFoundException;
+import com.eduaircontrol.msclassroom.shared.exception.ValidationException;
 import com.eduaircontrol.msclassroom.domain.model.EducationalEnvironment;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
 import java.math.BigDecimal;
