@@ -222,4 +222,22 @@ class CampusControllerTest {
                 .andExpect(jsonPath("$.meta.total").value(1))
                 .andExpect(jsonPath("$.data[0].code").value("CAMP-A"));
     }
+
+    @Test
+    void acceptsGatewayIdentityHeaders() throws Exception {
+        mockMvc.perform(get("/api/v1/campuses")
+                        .header("X-User-Id", "user-1")
+                        .header("X-User-Role", "USER"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void adminViaGatewayHeaderCanCreate() throws Exception {
+        mockMvc.perform(post("/api/v1/campuses")
+                        .header("X-User-Id", "admin-1")
+                        .header("X-User-Role", "ADMIN")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"code\":\"HDR-1\",\"name\":\"Header Campus\"}"))
+                .andExpect(status().isCreated());
+    }
 }
