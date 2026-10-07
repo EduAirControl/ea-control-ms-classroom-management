@@ -21,7 +21,7 @@ public class CampusService {
 
     @Transactional(readOnly = true)
     public PageResult<Campus> list(String query, RecordStatus status, int page, int limit) {
-        return campusRepository.search(query, status, page, limit);
+        return campusRepository.search(query, status, TenantContext.institutionId(), page, limit);
     }
 
     @Transactional(readOnly = true)
@@ -41,6 +41,7 @@ public class CampusService {
                 .name(requireText(name, "name"))
                 .city(emptyToNull(city))
                 .status(status != null ? status : RecordStatus.ACTIVE)
+                .institutionId(TenantContext.institutionId())
                 .build();
         return campusRepository.save(campus);
     }

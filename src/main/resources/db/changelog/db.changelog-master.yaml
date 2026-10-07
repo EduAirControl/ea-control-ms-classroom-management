@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/changes/004-add-environment-constraints.yaml
   - include:
       file: db/changelog/changes/005-create-indexes.yaml
+  - include:
+      file: db/changelog/changes/006-add-campus-institution.yaml
+  - include:
+      file: db/changelog/changes/007-add-environment-institution.yaml

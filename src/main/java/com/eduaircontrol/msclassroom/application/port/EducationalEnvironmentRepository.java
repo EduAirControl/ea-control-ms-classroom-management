@@ -18,6 +18,8 @@ public interface EducationalEnvironmentRepository {
 
     boolean existsActiveEnvironmentType(UUID environmentTypeId);
 
+    Optional<UUID> findCampusInstitutionId(UUID campusId);
+
     PageResult<EducationalEnvironment> search(String query, RecordStatus status,
-            UUID campusId, UUID environmentTypeId, int page, int limit);
+            UUID campusId, UUID environmentTypeId, UUID institutionId, int page, int limit);
 }

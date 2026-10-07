@@ -36,6 +36,9 @@ public class EducationalEnvironment {
     @Column(name = "campus_id", nullable = false)
     private UUID campusId;
 
+    @Column(name = "institution_id")
+    private UUID institutionId;
+
     @Column(nullable = false, length = 30)
     private String code;
 

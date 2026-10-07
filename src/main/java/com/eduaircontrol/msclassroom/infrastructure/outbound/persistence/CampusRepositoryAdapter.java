@@ -38,7 +38,7 @@ public class CampusRepositoryAdapter implements CampusRepository {
     }
 
     @Override
-    public PageResult<Campus> search(String query, RecordStatus status, int page, int limit) {
+    public PageResult<Campus> search(String query, RecordStatus status, UUID institutionId, int page, int limit) {
         Specification<Campus> specification = (root, q, cb) -> {
             List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
             predicates.add(cb.isNull(root.get("deletedAt")));
@@ -51,6 +51,9 @@ public class CampusRepositoryAdapter implements CampusRepository {
             }
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
+            }
+            if (institutionId != null) {
+                predicates.add(cb.equal(root.get("institutionId"), institutionId));
             }
             return cb.and(predicates.toArray(jakarta.persistence.criteria.Predicate[]::new));
         };
