@@ -2,12 +2,17 @@ package com.eduaircontrol.msclassroom.application;
 
 import com.eduaircontrol.msclassroom.domain.model.PageResult;
 import com.eduaircontrol.msclassroom.domain.port.out.EducationalEnvironmentRepository;
+import com.eduaircontrol.msclassroom.infrastructure.messaging.OutboxWriter;
+import com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentCreatedEvent;
+import com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentUpdatedEvent;
+import com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentRemovedEvent;
 import com.eduaircontrol.msclassroom.shared.exception.ConflictException;
 import com.eduaircontrol.msclassroom.shared.exception.NotFoundException;
 import com.eduaircontrol.msclassroom.shared.exception.ValidationException;
 import com.eduaircontrol.msclassroom.domain.model.EducationalEnvironment;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EducationalEnvironmentService {
 
     private final EducationalEnvironmentRepository environmentRepository;
+    private final OutboxWriter outboxWriter;
 
     @Transactional(readOnly = true)
     public PageResult<EducationalEnvironment> list(String query, RecordStatus status,
@@ -34,6 +40,7 @@ public class EducationalEnvironmentService {
                 .orElseThrow(() -> new NotFoundException("Educational environment not found: " + id));
     }
 
+    @Transactional
     public EducationalEnvironment create(UUID campusId, String code, String name,
             UUID environmentTypeId, Integer floor, BigDecimal areaM2,
             Integer occupancyCapacity, RecordStatus status) {
@@ -47,16 +54,32 @@ public class EducationalEnvironmentService {
                 .institutionId(environmentRepository.findCampusInstitutionId(campusId)
                         .orElse(TenantContext.institutionId()))
                 .code(normalizedCode)
-                .name(CampusService.requireText(name, "name"))
+                .name(name)
                 .environmentTypeId(environmentTypeId)
                 .floor(floor)
                 .areaM2(areaM2)
                 .occupancyCapacity(occupancyCapacity)
                 .status(status != null ? status : RecordStatus.ACTIVE)
                 .build();
-        return environmentRepository.save(environment);
+        EducationalEnvironment saved = environmentRepository.save(environment);
+
+        // Emitir evento de creación
+        outboxWriter.append(
+                "EducationalEnvironmentCreated",
+                "EducationalEnvironment",
+                environment.getId().toString(),
+                "classroom.educational_environment.created",
+                com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentCreatedEvent
+                        .of(environment.getId(), environment.getCode(), environment.getName(),
+                            environment.getCampusId(), environment.getEnvironmentTypeId(),
+                            environment.getFloor(), environment.getStatus().name(), Instant.now()),
+                Instant.now()
+        );
+
+        return environment;
     }
 
+    @Transactional
     public EducationalEnvironment update(UUID id, UUID campusId, String code, String name,
             UUID environmentTypeId, Integer floor, BigDecimal areaM2,
             Integer occupancyCapacity, RecordStatus status) {
@@ -79,10 +102,9 @@ public class EducationalEnvironmentService {
             environment.setCode(normalizedCode);
         }
         if (name != null) {
-            environment.setName(CampusService.requireText(name, "name"));
+            environment.setName(name);
         }
         if (environmentTypeId != null) {
-            requireEnvironmentType(environmentTypeId);
             environment.setEnvironmentTypeId(environmentTypeId);
         }
         if (floor != null) {
@@ -97,13 +119,64 @@ public class EducationalEnvironmentService {
         if (status != null) {
             environment.setStatus(status);
         }
-        return environmentRepository.save(environment);
+        EducationalEnvironment saved = environmentRepository.save(environment);
+
+        // Emitir evento de actualización
+        outboxWriter.append(
+                "EducationalEnvironmentUpdated",
+                "EducationalEnvironment",
+                environment.getId().toString(),
+                "classroom.educational_environment.updated",
+                com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentUpdatedEvent
+                        .builder()
+                        .eventId(java.util.UUID.randomUUID())
+                        .aggregateId(saved.getId())
+                        .payload(com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentUpdatedEvent.Payload.builder()
+                                .environmentId(environment.getId())
+                                .code(environment.getCode())
+                                .name(environment.getName())
+                                .campusId(environment.getCampusId())
+                                .environmentTypeId(environment.getEnvironmentTypeId())
+                                .floor(environment.getFloor())
+                                .status(environment.getStatus().name())
+                                .build())
+                        .occurredAt(java.time.Instant.now())
+                        .build(),
+                java.time.Instant.now()
+        );
+
+        return saved;
     }
 
+    @Transactional
     public void delete(UUID id) {
         EducationalEnvironment environment = get(id);
         environment.softDelete();
         environmentRepository.save(environment);
+
+        // Emitir evento de eliminación (soft delete)
+        outboxWriter.append(
+                "EducationalEnvironmentRemoved",
+                "EducationalEnvironment",
+                environment.getId().toString(),
+                "classroom.educational_environment.removed",
+                com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentRemovedEvent
+                        .builder()
+                        .eventId(java.util.UUID.randomUUID())
+                        .aggregateId(environment.getId())
+                        .payload(com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentRemovedEvent.Payload.builder()
+                                .environmentId(environment.getId())
+                                .code(environment.getCode())
+                                .name(environment.getName())
+                                .campusId(environment.getCampusId())
+                                .environmentTypeId(environment.getEnvironmentTypeId())
+                                .floor(environment.getFloor())
+                                .status(environment.getStatus().name())
+                                .build())
+                        .occurredAt(java.time.Instant.now())
+                        .build(),
+                java.time.Instant.now()
+        );
     }
 
     private void requireReferences(UUID campusId, UUID environmentTypeId) {
