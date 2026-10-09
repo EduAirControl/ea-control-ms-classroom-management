@@ -29,6 +29,9 @@ public class OutboxRelay {
     @Value("${app.outbox.batch-size:100}")
     private int batchSize;
 
+    @Value("${app.outbox.stale-minutes:5}")
+    private long staleMinutes;
+
     @Scheduled(fixedDelayString = "${app.outbox.relay-interval-ms:1000}")
     @Transactional(readOnly = true)
     public void publishPending() {
@@ -49,11 +52,12 @@ public class OutboxRelay {
      * están fallando.
      */
     @Scheduled(fixedDelayString = "${app.outbox.health-interval-ms:60000}")
-    public void checkStaleEvents(@org.springframework.beans.factory.annotation.Value("${app.outbox.stale-minutes:5}") long minutes) {
+    public void checkStaleEvents() {
         long stale = repository.countByPublishedAtIsNullAndOccurredAtBefore(
-                java.time.Instant.now().minusSeconds(minutes * 60));
+                java.time.Instant.now().minusSeconds(staleMinutes * 60));
         if (stale > 0) {
-            log.warn("Outbox: {} evento(s) sin publicar hace más de {} minuto(s)", stale, minutes);
+            log.warn("Outbox: {} evento(s) sin publicar hace más de {} minuto(s)",
+                    stale, staleMinutes);
         }
     }
 }
