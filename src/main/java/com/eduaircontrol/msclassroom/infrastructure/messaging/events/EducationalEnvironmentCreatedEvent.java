@@ -60,10 +60,9 @@ public class EducationalEnvironmentCreatedEvent {
                                                         UUID campusId, UUID environmentTypeId, Integer floor,
                                                         String status, Instant occurredAt) {
         UUID eventId = java.util.UUID.randomUUID();
-        UUID aggregateId = java.util.UUID.randomUUID();
         Payload payload = Payload.builder()
-                .environmentId(java.util.UUID.randomUUID())
-                .code(java.util.UUID.randomUUID().toString()) // placeholder
+                .environmentId(environmentId)
+                .code(code)
                 .name(name)
                 .campusId(campusId)
                 .environmentTypeId(environmentTypeId)
@@ -72,7 +71,7 @@ public class EducationalEnvironmentCreatedEvent {
                 .build();
         return EducationalEnvironmentCreatedEvent.builder()
                 .eventId(eventId)
-                .aggregateId(aggregateId)
+                .aggregateId(environmentId)
                 .payload(payload)
                 .occurredAt(occurredAt != null ? occurredAt : java.time.Instant.now())
                 .build();
