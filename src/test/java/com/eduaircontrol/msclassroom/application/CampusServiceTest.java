@@ -8,9 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.eduaircontrol.msclassroom.application.port.CampusRepository;
-import com.eduaircontrol.msclassroom.domain.exception.ConflictException;
-import com.eduaircontrol.msclassroom.domain.exception.NotFoundException;
+import com.eduaircontrol.msclassroom.domain.port.out.CampusRepository;
+import com.eduaircontrol.msclassroom.shared.exception.ConflictException;
+import com.eduaircontrol.msclassroom.shared.exception.NotFoundException;
 import com.eduaircontrol.msclassroom.domain.model.Campus;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
 import java.util.Optional;
