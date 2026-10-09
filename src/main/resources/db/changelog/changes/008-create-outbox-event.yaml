@@ -6,6 +6,12 @@ databaseChangeLog:
         Outbox transaccional (ADR-007) de los eventos de ciclo de vida de ambientes
         educativos. Se escribe en la misma transaccion que el cambio de negocio y lo
         publica OutboxRelay hacia el broker.
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              schemaName: classrooms
+              tableName: outbox_event
       changes:
         - createTable:
             schemaName: classrooms
