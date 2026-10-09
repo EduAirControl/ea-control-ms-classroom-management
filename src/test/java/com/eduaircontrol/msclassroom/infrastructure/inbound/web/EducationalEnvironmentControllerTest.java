@@ -7,7 +7,7 @@ import com.eduaircontrol.msclassroom.domain.model.Campus;
 import com.eduaircontrol.msclassroom.domain.model.EducationalEnvironment;
 import com.eduaircontrol.msclassroom.domain.model.EnvironmentType;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
-import com.eduaircontrol.msclassroom.shared.security.JwtService;
+import com.eduaircontrol.msclassroom.shared.security.TestTokenMint;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class EducationalEnvironmentControllerTest {
     private EducationalEnvironmentJpaRepository environmentRepository;
 
     @Autowired
-    private JwtService jwtService;
+    private TestTokenMint jwtService;
 
     @Autowired
     private ObjectMapper objectMapper;
