@@ -3,7 +3,7 @@ package com.eduaircontrol.msclassroom.infrastructure.web;
 import com.eduaircontrol.msclassroom.infrastructure.persistence.CampusJpaRepository;
 import com.eduaircontrol.msclassroom.domain.model.Campus;
 import com.eduaircontrol.msclassroom.domain.model.RecordStatus;
-import com.eduaircontrol.msclassroom.shared.security.JwtService;
+import com.eduaircontrol.msclassroom.shared.security.TestTokenMint;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class CampusControllerTest {
     private CampusJpaRepository campusRepository;
 
     @Autowired
-    private JwtService jwtService;
+    private TestTokenMint jwtService;
 
     @Autowired
     private ObjectMapper objectMapper;
