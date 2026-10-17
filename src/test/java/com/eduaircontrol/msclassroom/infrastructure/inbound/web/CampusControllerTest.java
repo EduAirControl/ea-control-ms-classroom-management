@@ -100,14 +100,16 @@ class CampusControllerTest {
     }
 
     /**
-     * Detras del gateway la identidad llega por headers. Antes solo se reenviaba el
-     * primer rol, de modo que un usuario ADMIN+SUPER_ADMIN perdia SUPER_ADMIN al cruzarlo.
+     * Un token con varios roles conserva todos al cruzar el servicio: el rol
+     * efectivo sale del JWT, no de un header de un solo valor.
      */
     @Test
-    void createViaGatewayHeadersCarriesEveryRole() throws Exception {
+    void multiRoleTokenKeepsEveryRole() throws Exception {
+        String multiRoleToken = TestTokenMint.mint(
+                UUID.randomUUID(), "saadmin@test.com", java.util.List.of("ADMIN", "SUPER_ADMIN"));
+
         mockMvc.perform(post("/api/v1/campuses")
-                        .header("X-User-Id", UUID.randomUUID().toString())
-                        .header("X-User-Roles", "ADMIN,SUPER_ADMIN")
+                        .header("Authorization", "Bearer " + multiRoleToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"code\":\"camp-gw\",\"name\":\"Campus GW\"}"))
                 .andExpect(status().isCreated());
@@ -227,46 +229,57 @@ class CampusControllerTest {
     }
 
     @Test
-    void listIsScopedByInstitutionHeader() throws Exception {
+    void listIsScopedByInstitutionClaim() throws Exception {
         UUID institutionA = UUID.randomUUID();
         UUID institutionB = UUID.randomUUID();
+        String tokenA = TestTokenMint.mint(
+                UUID.randomUUID(), "admin@test.com", java.util.List.of("ADMIN"), institutionA, null);
+        String tokenB = TestTokenMint.mint(
+                UUID.randomUUID(), "admin@test.com", java.util.List.of("ADMIN"), institutionB, null);
 
         mockMvc.perform(post("/api/v1/campuses")
-                        .header("Authorization", "Bearer " + adminToken)
-                        .header("X-Institution-Id", institutionA.toString())
+                        .header("Authorization", "Bearer " + tokenA)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"code\":\"CAMP-A\",\"name\":\"Campus A\"}"))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/campuses")
-                        .header("Authorization", "Bearer " + adminToken)
-                        .header("X-Institution-Id", institutionB.toString()))
+                        .header("Authorization", "Bearer " + tokenB))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.meta.total").value(0));
 
         mockMvc.perform(get("/api/v1/campuses")
-                        .header("Authorization", "Bearer " + adminToken)
-                        .header("X-Institution-Id", institutionA.toString()))
+                        .header("Authorization", "Bearer " + tokenA))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.meta.total").value(1))
                 .andExpect(jsonPath("$.data[0].code").value("CAMP-A"));
     }
 
+    /**
+     * Regresion de R-001: los headers de identidad del gateway ya no autentican
+     * nada. Sin token la peticion es 401 aunque vayan headers de ADMIN.
+     */
     @Test
-    void acceptsGatewayIdentityHeaders() throws Exception {
+    void forgedIdentityHeadersDoNotAuthenticate() throws Exception {
         mockMvc.perform(get("/api/v1/campuses")
                         .header("X-User-Id", "user-1")
                         .header("X-User-Role", "USER"))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
     }
 
+    /**
+     * Regresion de R-001: un token USER acompañado de headers forjados de ADMIN
+     * sigue sin poder escribir. El unico rol efectivo es el del token.
+     */
     @Test
-    void adminViaGatewayHeaderCanCreate() throws Exception {
+    void forgedAdminHeadersDoNotElevateAUserToken() throws Exception {
         mockMvc.perform(post("/api/v1/campuses")
+                        .header("Authorization", "Bearer " + userToken)
                         .header("X-User-Id", "admin-1")
                         .header("X-User-Role", "ADMIN")
+                        .header("X-User-Roles", "ADMIN,SUPER_ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"code\":\"HDR-1\",\"name\":\"Header Campus\"}"))
-                .andExpect(status().isCreated());
+                .andExpect(status().isForbidden());
     }
 }
