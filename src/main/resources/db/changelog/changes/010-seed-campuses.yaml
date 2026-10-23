@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-seed-campuses
+      author: eduaircontrol
+      comment: "Sedes de ejemplo para desarrollo local."
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: |
+              INSERT INTO classrooms.campuses (campus_id, code, name, city, status)
+              VALUES
+                ('00000000-0000-4000-8000-000000000302', 'NORTH', 'Campus Norte', 'Bogota', 'ACTIVE'),
+                ('00000000-0000-4000-8000-000000000303', 'SOUTH', 'Campus Sur', 'Bogota', 'ACTIVE'),
+                ('00000000-0000-4000-8000-000000000304', 'MEDELLIN', 'Campus Medellin', 'Medellin', 'ACTIVE'),
+                ('00000000-0000-4000-8000-000000000305', 'CALI', 'Campus Cali', 'Cali', 'ACTIVE'),
+                ('00000000-0000-4000-8000-000000000306', 'BARRANQUILLA', 'Campus Barranquilla', 'Barranquilla', 'ACTIVE')
+              ON CONFLICT DO NOTHING;
+      rollback:
+        - sql:
+            dbms: postgresql
+            sql: |
+              DELETE FROM classrooms.campuses
+              WHERE campus_id IN (
+                '00000000-0000-4000-8000-000000000302',
+                '00000000-0000-4000-8000-000000000303',
+                '00000000-0000-4000-8000-000000000304',
+                '00000000-0000-4000-8000-000000000305',
+                '00000000-0000-4000-8000-000000000306'
+              );
