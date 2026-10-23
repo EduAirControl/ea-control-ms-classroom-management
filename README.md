@@ -44,7 +44,8 @@ docker compose up -d
 # Verificar
 curl http://localhost:3002/health
 
-# Desarrollo sin Docker (necesita un PostgreSQL con la variable POSTGRES_URL)
+# Desarrollo sin Docker: parte de .env.example (cópialo a .env y ajusta POSTGRES_*)
+cp -n .env.example .env
 source <(grep -E '^POSTGRES_(URL|USER|PASSWORD)=' .env)   # o exportarlas
 ./mvnw spring-boot:run
 ```
