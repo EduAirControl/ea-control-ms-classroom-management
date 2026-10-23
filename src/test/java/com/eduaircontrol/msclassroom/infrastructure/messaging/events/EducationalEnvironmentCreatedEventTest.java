@@ -30,16 +30,18 @@ class EducationalEnvironmentCreatedEventTest {
     void ofCarriesTheRealEnvironmentData() {
         UUID environmentId = UUID.randomUUID();
         UUID campusId = UUID.randomUUID();
+        UUID institutionId = UUID.randomUUID();
         UUID environmentTypeId = UUID.randomUUID();
 
         EducationalEnvironmentCreatedEvent event = EducationalEnvironmentCreatedEvent.of(
-                environmentId, "A-101", "Aula 101", campusId, environmentTypeId, 2, "ACTIVE",
-                Instant.parse("2026-01-01T10:00:00Z"));
+                environmentId, "A-101", "Aula 101", campusId, institutionId, environmentTypeId,
+                2, "ACTIVE", Instant.parse("2026-01-01T10:00:00Z"));
 
         assertThat(event.getPayload().getEnvironmentId()).isEqualTo(environmentId);
         assertThat(event.getPayload().getCode()).isEqualTo("A-101");
         assertThat(event.getPayload().getName()).isEqualTo("Aula 101");
         assertThat(event.getPayload().getCampusId()).isEqualTo(campusId);
+        assertThat(event.getPayload().getInstitutionId()).isEqualTo(institutionId);
         assertThat(event.getPayload().getEnvironmentTypeId()).isEqualTo(environmentTypeId);
         assertThat(event.getPayload().getFloor()).isEqualTo(2);
         assertThat(event.getPayload().getStatus()).isEqualTo("ACTIVE");
@@ -50,8 +52,8 @@ class EducationalEnvironmentCreatedEventTest {
         UUID environmentId = UUID.randomUUID();
 
         EducationalEnvironmentCreatedEvent event = EducationalEnvironmentCreatedEvent.of(
-                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(), 1,
-                "ACTIVE", Instant.now());
+                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), 1, "ACTIVE", Instant.now());
 
         assertThat(event.getAggregateId()).isEqualTo(environmentId);
         assertThat(event.getAggregateType()).isEqualTo("EducationalEnvironment");
@@ -68,11 +70,12 @@ class EducationalEnvironmentCreatedEventTest {
     void serializedEnvelopeMatchesWhatTheConsumerReads() throws Exception {
         UUID environmentId = UUID.randomUUID();
         UUID campusId = UUID.randomUUID();
+        UUID institutionId = UUID.randomUUID();
         UUID environmentTypeId = UUID.randomUUID();
 
         EducationalEnvironmentCreatedEvent event = EducationalEnvironmentCreatedEvent.of(
-                environmentId, "A-101", "Aula 101", campusId, environmentTypeId, 2, "ACTIVE",
-                Instant.parse("2026-01-01T10:00:00Z"));
+                environmentId, "A-101", "Aula 101", campusId, institutionId, environmentTypeId,
+                2, "ACTIVE", Instant.parse("2026-01-01T10:00:00Z"));
 
         String json = MAPPER.writeValueAsString(event);
 
@@ -82,6 +85,8 @@ class EducationalEnvironmentCreatedEventTest {
                 .contains("\"code\":\"A-101\"")
                 .contains("\"name\":\"Aula 101\"")
                 .contains("\"campusId\":\"" + campusId + "\"")
+                // El consumidor aisla por institucion (ADR-016): el campo debe viajar.
+                .contains("\"institutionId\":\"" + institutionId + "\"")
                 .contains("\"environmentTypeId\":\"" + environmentTypeId + "\"")
                 .contains("\"floor\":2")
                 .contains("\"status\":\"ACTIVE\"");
@@ -92,11 +97,11 @@ class EducationalEnvironmentCreatedEventTest {
         UUID environmentId = UUID.randomUUID();
 
         UUID first = EducationalEnvironmentCreatedEvent.of(
-                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(), 1,
-                "ACTIVE", Instant.now()).getEventId();
+                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), 1, "ACTIVE", Instant.now()).getEventId();
         UUID second = EducationalEnvironmentCreatedEvent.of(
-                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(), 1,
-                "ACTIVE", Instant.now()).getEventId();
+                environmentId, "A-101", "Aula 101", UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), 1, "ACTIVE", Instant.now()).getEventId();
 
         // El consumidor deduplica por eventId: dos eventos del mismo ambiente deben
         // poder procesarse los dos.

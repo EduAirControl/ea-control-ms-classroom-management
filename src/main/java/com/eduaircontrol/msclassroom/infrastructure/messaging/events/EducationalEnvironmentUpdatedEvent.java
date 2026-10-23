@@ -43,6 +43,7 @@ public class EducationalEnvironmentUpdatedEvent {
         private String code;
         private String name;
         private UUID campusId;
+        private UUID institutionId;
         private UUID environmentTypeId;
         private Integer floor;
         private String status;

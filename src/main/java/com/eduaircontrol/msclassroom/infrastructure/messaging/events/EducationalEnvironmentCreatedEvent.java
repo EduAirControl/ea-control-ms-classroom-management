@@ -43,6 +43,7 @@ public class EducationalEnvironmentCreatedEvent {
         private String code;
         private String name;
         private UUID campusId;
+        private UUID institutionId;
         private UUID environmentTypeId;
         private Integer floor;
         private String status;
@@ -57,7 +58,8 @@ public class EducationalEnvironmentCreatedEvent {
     public Payload getPayload() { return payload; }
 
     public static EducationalEnvironmentCreatedEvent of(UUID environmentId, String code, String name,
-                                                        UUID campusId, UUID environmentTypeId, Integer floor,
+                                                        UUID campusId, UUID institutionId,
+                                                        UUID environmentTypeId, Integer floor,
                                                         String status, Instant occurredAt) {
         UUID eventId = java.util.UUID.randomUUID();
         Payload payload = Payload.builder()
@@ -65,6 +67,7 @@ public class EducationalEnvironmentCreatedEvent {
                 .code(code)
                 .name(name)
                 .campusId(campusId)
+                .institutionId(institutionId)
                 .environmentTypeId(environmentTypeId)
                 .floor(floor)
                 .status(status)
