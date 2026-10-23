@@ -35,7 +35,7 @@ src/main/java/com/eduaircontrol/msclassroom/
 Liquibase: `src/main/resources/db/changelog/` (master + changes por dominio, patrón §12 de
 `06-data/domain/ms-classroom-management.md`). Se ejecutan automáticamente al arrancar.
 
-## Cómo correrlo localmente
+## Running it locally
 
 ```bash
 # Con Docker (incluye su propio PostgreSQL en el puerto 5433)
@@ -44,8 +44,9 @@ docker compose up -d
 # Verificar
 curl http://localhost:3002/health
 
-# Desarrollo sin Docker (necesita un PostgreSQL con la variable POSTGRES_URL)
-source <(grep -E '^POSTGRES_(URL|USER|PASSWORD)=' .env)   # o exportarlas
+# Local development without Docker: start from .env.example (copy to .env, set POSTGRES_*)
+cp -n .env.example .env
+source <(grep -E '^POSTGRES_(URL|USER|PASSWORD)=' .env)   # or export them
 ./mvnw spring-boot:run
 ```
 
