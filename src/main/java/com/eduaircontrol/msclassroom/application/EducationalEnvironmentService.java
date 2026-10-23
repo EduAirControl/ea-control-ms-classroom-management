@@ -71,7 +71,8 @@ public class EducationalEnvironmentService {
                 "classroom.educational_environment.created",
                 com.eduaircontrol.msclassroom.infrastructure.messaging.events.EducationalEnvironmentCreatedEvent
                         .of(environment.getId(), environment.getCode(), environment.getName(),
-                            environment.getCampusId(), environment.getEnvironmentTypeId(),
+                            environment.getCampusId(), environment.getInstitutionId(),
+                            environment.getEnvironmentTypeId(),
                             environment.getFloor(), environment.getStatus().name(), Instant.now()),
                 Instant.now()
         );
@@ -136,6 +137,7 @@ public class EducationalEnvironmentService {
                                 .code(environment.getCode())
                                 .name(environment.getName())
                                 .campusId(environment.getCampusId())
+                                .institutionId(environment.getInstitutionId())
                                 .environmentTypeId(environment.getEnvironmentTypeId())
                                 .floor(environment.getFloor())
                                 .status(environment.getStatus().name())
